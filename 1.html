@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>自定义滚动条</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+	#wrap {
+		position: relative;
+		width: 400px;
+		height: 500px;
+		background-color:hsla(250,100%,50%,0.5);
+		padding-right: 50px;
+		overflow: hidden;
+	}
+	#content {
+		position: relative;
+		overflow: hidden;
+	}
+	#sliderBar {
+		position: absolute;
+		right: 0;
+		top: 0;
+		width: 50px;
+		height: 100%;
+		background-color:hsla(100,100%,50%,0.8);
+	}
+	#slider {
+		width: 50px;
+		height: 20px;
+		background-color: cyan;
+		position: absolute;
+		top:0;
+	}
+	</style>
+</head>
+<body>
+<div id="wrap">
+	<div id="content">
+	 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+	</div>
+	<div id="sliderBar">
+		<div id="slider"></div>
+	</div>
+</div>
+	<script type="text/javascript">
+		var wrap = document.getElementById("wrap");
+		var content = document.getElementById("content");
+		var sliderBar = document.getElementById("sliderBar");
+		var slider = document.getElementById("slider");
+
+		var scale = wrap.offsetHeight/content.offsetHeight;
+		slider.style.height = scale * sliderBar.offsetHeight + "px";
+
+		function mousewheel(element,up,down) {
+			element.onmousewheel = handle;
+			if (window.addEventListener) {
+				element.addEventListener("DOMMouseScroll",handle,false);				
+			}
+			function handle(e){
+				var e =e || window.event;
+				if (e.wheelDelta < 0 || e.detail > 0) {
+					down();
+				} else {
+					up();
+				}
+			}
+		}
+		var maxHeight = sliderBar.offsetHeight - slider.offsetHeight;
+		mousewheel(wrap,function(){
+			//滚轮向上
+			var sliderTop = slider.offsetTop;
+			sliderTop -= 10;
+			if (sliderTop < 0) {
+				sliderTop = 0;
+			} 
+			slider.style.top = sliderTop + "px";
+			// alert("a")
+			var scaleY = sliderTop/sliderBar.offsetHeight;
+			
+			content.style.top = - scaleY*sliderBar.offsetHeight + "px"
+		},function(){
+			//滚轮向下
+			var sliderTop = slider.offsetTop;
+			sliderTop += 10;
+			if (sliderTop > maxHeight) {
+				sliderTop = maxHeight;
+			} 
+			slider.style.top = sliderTop + "px"
+			// alert("a");
+			var scaleY = sliderTop/sliderBar.offsetHeight;
+			
+			content.style.top = - scaleY*sliderBar.offsetHeight + "px"
+		})
+		
+		var wrapPos = wrap.getBoundingClientRect();
+		sliderBar.onclick = function(e){
+			var e = e || window.event;
+			var sliderTop = e.clientY - slider.offsetHeight/2 -wrapPos.top;
+			//判断边界
+			if (sliderTop < 0) {
+				sliderTop = 0;
+			} else if(sliderTop > maxHeight){
+				sliderTop = maxHeight;
+			}
+			var scaleY = sliderTop/sliderBar.offsetHeight;
+			slider.style.top = sliderTop + "px";
+			content.style.top = - scaleY*sliderBar.offsetHeight + "px"
+		}
+		//拖拽
+		slider.onmousedown = function(e){
+			var e = e || window.event;
+			var oTop = e.clientY - slider.offsetTop -wrapPos.top;
+			document.onmousemove = function(e){
+				var e = e || window.event;
+				var sliderTop = e.clientY -oTop;
+				slider.style.top = sliderTop + "px";
+				var scaleY = sliderTop/sliderBar.offsetHeight;
+			content.style.top = - scaleY*sliderBar.offsetHeight + "px"
+			}
+			document.onmouseup = function(){
+				document.onmousemove = null;
+			}
+		}
+		slider.onclick = function(e){
+			var e = e || window.event;
+			e.cancelBubble = true;
+		}
+
+		document.onkeydown = function(e){
+			var e = e || window.event;
+			if(e.keyCode == 38){
+					var sliderTop = slider.offsetTop;
+			sliderTop -= 10;
+			if (sliderTop < 0) {
+				sliderTop = 0;
+			} 
+			slider.style.top = sliderTop + "px";
+			var scaleY = sliderTop/sliderBar.offsetHeight;
+			
+			content.style.top = - scaleY*sliderBar.offsetHeight + "px"
+			}
+			else if(e.keyCode ==40){
+				var sliderTop = slider.offsetTop;
+			sliderTop += 10;
+			if (sliderTop > maxHeight) {
+				sliderTop = maxHeight;
+			} 
+			slider.style.top = sliderTop + "px"
+			var scaleY = sliderTop/sliderBar.offsetHeight;
+			
+			content.style.top = - scaleY*sliderBar.offsetHeight + "px"
+			}
+		}
+
+
+
+
+	</script>
+</body>
+</html>
